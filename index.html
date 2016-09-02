@@ -24,7 +24,9 @@
         }
 
         var platforms;
-
+        var stars;
+        var score = 0;
+        var scoreText;
 
         function create() {
             game.physics.startSystem(Phaser.Physics.ARCADE); //Enable Arcade Physics system    
@@ -53,12 +55,24 @@
             player.animations.add('left', [0, 1, 2, 3], 10, true);
             player.animations.add('right', [5, 6, 7, 8], 10, true);
             
-
-            game.add.sprite(0 ,0, 'star');
+            stars = game.add.group();
+            stars.enableBody = true;
+            
+            for(var i = 0; i<12; i++){
+                var star = stars.create(i*70, 0, 'star');
+                
+                star.body.gravity.y = 9;
+                
+                star.body.bounce.y = 0.7 + Math.random()*0.2;
+            }
+            
+            scoreText = game.add.text(16, 16, 'score: 0', {fontsize: '32px', fill: '#000'});
         }
 
         function update() {
             game.physics.arcade.collide(player, platforms);
+            game.physics.arcade.collide(stars, platforms);
+            game.physics.arcade.overlap(player, stars, collectStar, null, this);
             
             cursors = game.input.keyboard.createCursorKeys();
             
@@ -78,6 +92,13 @@
             if(cursors.up.isDown && player.body.touching.down) {
                 player.body.velocity.y = -350;
             }
+        }
+        
+        function collectStar(player, star){
+            star.kill();
+            
+            score += 10;
+            scoreText.text = 'Score: ' + score;
         }
 
     </script>
